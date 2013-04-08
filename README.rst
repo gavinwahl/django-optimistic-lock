@@ -43,7 +43,7 @@ a ``ConcurrentUpdate``.
 
 Comparison to ``django-concurrency``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`django-concurrency` <https://github.com/saxix/django-concurrency>`_.
+`django-concurrency <https://github.com/saxix/django-concurrency>`_.
 uses ``SELECT FOR UPDATE`` to implement the version checking. I wanted
 to avoid database-level locking, so ``django-optimistic-lock`` adds a
 version filter to the update statement, as described by Martin Fowler
