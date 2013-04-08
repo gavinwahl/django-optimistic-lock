@@ -43,19 +43,11 @@ a ``ConcurrentUpdate``.
 
 Comparison to ``django-concurrency``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`django-concurrency <https://github.com/saxix/django-concurrency>`_.
+`django-concurrency <https://github.com/saxix/django-concurrency>`_
 uses ``SELECT FOR UPDATE`` to implement the version checking. I wanted
 to avoid database-level locking, so ``django-optimistic-lock`` adds a
 version filter to the update statement, as described by Martin Fowler
 [1]_.
-
-TODO
-----
-A form field that tracks the version in a hidden field, like
-``django-concurrency``. This will allow conflicting updates between the
-time a page with a form was rendered and the time the form was submitted
-to be detected. An app using ``django-optimistic-lock`` should display a
-conflict-resolution page when this happens.
 
 Running the tests
 -----------------

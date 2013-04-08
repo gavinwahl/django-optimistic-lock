@@ -1,0 +1,7 @@
+<!doctype html>
+<title>form</title>
+<form method=post>
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type=submit>
+</form>

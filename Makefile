@@ -1,3 +1,5 @@
+TESTS=tests
+
 test:
 	cd tests && $(COVERAGE_COMMAND) ./manage.py test $(TESTS) --verbosity=2
 
