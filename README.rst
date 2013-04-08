@@ -1,6 +1,9 @@
 django-optimistic-lock
 ======================
 
+.. image:: https://secure.travis-ci.org/gavinwahl/django-optimistic-lock.png?branch=master
+   :target: https://travis-ci.org/gavinwahl/django-optimistic-lock
+
 Implements an offline optimistic lock [1]_ for Django models. Requires
 Django 1.6, because model saving was recently refactored to allow access
 to the update query [2]_.
