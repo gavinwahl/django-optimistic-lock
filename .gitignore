@@ -3,3 +3,4 @@
 htmlcov
 dist/
 *.egg-info/
+sqlite_database
