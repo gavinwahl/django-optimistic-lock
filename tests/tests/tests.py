@@ -1,5 +1,3 @@
-from unittest import skipIf
-
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -7,6 +5,7 @@ from django import forms
 from django.test.client import Client
 from django import db
 from django.db import transaction
+from django.utils.unittest import skipIf
 
 from ool import ConcurrentUpdate
 
