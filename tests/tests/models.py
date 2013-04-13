@@ -31,3 +31,11 @@ class InheritedVersionedModel(VersionedMixin, NotVersionedModel):
 
 class ImproperlyConfiguredModel(VersionedMixin, models.Model):
     pass
+
+
+class CounterModel(VersionedMixin, models.Model):
+    version = VersionField()
+    count = models.PositiveIntegerField(default=0)
+
+    def __unicode__(self):
+        return unicode(self.count)

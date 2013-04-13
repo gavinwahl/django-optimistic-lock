@@ -1,13 +1,18 @@
-from django.test import TestCase
+from unittest import skipIf
+
+from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
 from django.test.client import Client
+from django import db
+from django.db import transaction
 
 from ool import ConcurrentUpdate
 
 from .models import (SimpleModel, ProxyModel, InheritedModel,
-                     InheritedVersionedModel, ImproperlyConfiguredModel)
+                     InheritedVersionedModel, ImproperlyConfiguredModel,
+                     CounterModel)
 
 
 def refetch(model_instance):
@@ -156,3 +161,70 @@ class FormTests(TestCase):
             b'<input id="id_version" name="version" readonly="readonly" type="text" value="1"',
             resp.content
         )
+
+
+def test_concurrently(times):
+    """
+    Add this decorator to small pieces of code that you want to test
+    concurrently to make sure they don't raise exceptions when run at the
+    same time.  E.g., some Django views that do a SELECT and then a subsequent
+    INSERT might fail when the INSERT assumes that the data has not changed
+    since the SELECT.
+    """
+    def test_concurrently_decorator(test_func):
+        def wrapper(*args, **kwargs):
+            exceptions = []
+            import threading
+
+            def call_test_func():
+                try:
+                    test_func(*args, **kwargs)
+                except Exception as e:
+                    exceptions.append(e)
+                    raise
+                finally:
+                    db.close_connection()
+            threads = []
+            for i in range(times):
+                threads.append(threading.Thread(target=call_test_func))
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            if exceptions:
+                raise Exception(
+                    'test_concurrently intercepted %s exceptions: %s' %
+                    (len(exceptions), exceptions))
+        return wrapper
+    return test_concurrently_decorator
+
+
+class ThreadTests(TransactionTestCase):
+    @skipIf(db.connection.vendor == 'sqlite',
+            "in-memory sqlite db can't be used between threads")
+    def test_threads(self):
+        """
+        Run 25 threads, each incrementing a shared counter 5 times.
+        """
+
+        obj = CounterModel.objects.create()
+        transaction.commit()
+
+        @test_concurrently(25)
+        def run():
+            for i in range(5):
+                while True:
+                    x = refetch(obj)
+                    transaction.commit()
+                    x.count += 1
+                    try:
+                        x.save()
+                        transaction.commit()
+                    except ConcurrentUpdate:
+                        # retry
+                        pass
+                    else:
+                        break
+        run()
+
+        self.assertEqual(refetch(obj).count, 5 * 25)
