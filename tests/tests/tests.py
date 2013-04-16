@@ -5,13 +5,13 @@ from django import forms
 from django.test.client import Client
 from django import db
 from django.db import transaction
-from django.utils.unittest import skipIf
+from django.utils.unittest import skipIf, expectedFailure
 
 from ool import ConcurrentUpdate
 
 from .models import (SimpleModel, ProxyModel, InheritedModel,
                      InheritedVersionedModel, ImproperlyConfiguredModel,
-                     CounterModel)
+                     CounterModel, ConcreteModel)
 
 
 def refetch(model_instance):
@@ -24,7 +24,6 @@ def refetch(model_instance):
 class OolTests(TestCase):
     def normal(self, model):
         x = model.objects.create(name='foo')
-        x.save()
         self.assertTrue(refetch(x).name == 'foo')
 
         x.name = 'bar'
@@ -34,7 +33,6 @@ class OolTests(TestCase):
 
     def conflict(self, model):
         x = model.objects.create(name='foo')
-        x.save()
 
         # conflicting update
         y = refetch(x)
@@ -44,38 +42,75 @@ class OolTests(TestCase):
             x.save()
         self.assertEqual(refetch(x).name, 'foo')
 
+    def test_version_matches_after_insert(self):
+        x = SimpleModel(name='foo')
+        x.save()
+        self.assertEqual(x.version, refetch(x).version)
+
     def test_simple(self):
         self.normal(SimpleModel)
         self.conflict(SimpleModel)
+        self.update_fields_doesnt_update(SimpleModel)
+        self.update_fields_still_checks(SimpleModel)
 
     def test_proxy(self):
         self.normal(ProxyModel)
         self.conflict(ProxyModel)
+        self.update_fields_doesnt_update(ProxyModel)
+        self.update_fields_still_checks(ProxyModel)
 
     def test_inheritance(self):
         self.normal(InheritedModel)
         self.conflict(InheritedModel)
+        self.update_fields_doesnt_update(InheritedModel)
+        self.update_fields_still_checks(InheritedModel)
 
     def test_unversioned_parent(self):
         self.normal(InheritedVersionedModel)
         self.conflict(InheritedVersionedModel)
+        self.update_fields_doesnt_update(InheritedVersionedModel)
+        self.update_fields_still_checks(InheritedVersionedModel)
 
-    def test_update_fields_bypasses_checking(self):
-        """
-        Not sure how I feel about this one...should it be possible to
-        bypass checking? Should calling save with update_fields not
-        containing version still check, just not update the version?
-        """
+    def test_abstract(self):
+        self.normal(ConcreteModel)
+        self.conflict(ConcreteModel)
+        self.update_fields_doesnt_update(ConcreteModel)
+        self.update_fields_still_checks(ConcreteModel)
+
+    @expectedFailure
+    def test_defer(self):
         x = SimpleModel.objects.create(name='foo')
+        y = SimpleModel.objects.defer('version').get(pk=x.pk)
         x.save()
+        with self.assertRaises(ConcurrentUpdate):
+            y.save()
 
+    def update_fields_doesnt_update(self, model):
+        """
+        Calling save with update_fields not containing version doesn't update
+        the version.
+        """
+        x = model.objects.create(name='foo')
         y = refetch(x)
+
         y.name = 'bar'
         # bypass versioning by only updating a single field
         y.save(update_fields=['name'])
 
         x.save()
         self.assertEqual(refetch(x).name, 'foo')
+
+    def update_fields_still_checks(self, model):
+        """
+        Excluding the VersionField from update_fields should still check
+        for conflicts.
+        """
+        x = model.objects.create(name='foo')
+        y = refetch(x)
+        x.save()
+        y.name = 'bar'
+        with self.assertRaises(ConcurrentUpdate):
+            y.save(update_fields=['name'])
 
     def test_get_version_field(self):
         self.assertEqual(
@@ -128,7 +163,7 @@ class FormTests(TestCase):
     def test_field_is_hidden(self):
         form = SimpleForm(instance=self.obj)
         self.assertIn(
-            '<input id="id_version" name="version" type="hidden" value="1"',
+            '<input id="id_version" name="version" type="hidden" value="0"',
             form.as_p()
         )
 
@@ -157,7 +192,7 @@ class FormTests(TestCase):
         )
 
         self.assertIn(
-            b'<input id="id_version" name="version" readonly="readonly" type="text" value="1"',
+            b'<input id="id_version" name="version" readonly="readonly" type="text" value="0"',
             resp.content
         )
 
