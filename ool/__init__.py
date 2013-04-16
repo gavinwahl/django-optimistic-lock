@@ -38,11 +38,6 @@ class VersionField(models.PositiveIntegerField):
         kwargs.setdefault('default', 0)
         super(VersionField, self).__init__(*args, **kwargs)
 
-    def pre_save(self, instance, add):
-        new_value = getattr(instance, self.attname) + 1
-        setattr(instance, self.attname, new_value)
-        return new_value
-
     def formfield(self, **kwargs):
         widget = kwargs.get('widget')
         if widget:
@@ -64,15 +59,27 @@ class VersionedMixin(object):
     def _do_update(self, base_qs, using, pk_val, values):
         version_field = self.get_version_field()
 
-        # Don't check version if the version isn't being updated. This
-        # also helps with model inheritance, so saves for models in the
-        # hierarchy that don't have version fields don't get checked.
-        if version_field not in [i[0] for i in values]:
+        # _do_update is called once for each model in the inheritance
+        # hierarchy. We only care about the model with the version field.
+        if version_field.model != base_qs.model:
             return super(VersionedMixin, self)._do_update(
                 base_qs, using, pk_val, values)
 
-        # pre_save has already been run, so compensate by subtracting 1
-        old_version = version_field.value_from_object(self) - 1
+        # pre_save may or may not have been called at this point, based on if
+        # version_field is in update_fields. Since we need to reliably know the
+        # old version, we can't increment there.
+        old_version = version_field.value_from_object(self)
+        setattr(self, version_field.attname, old_version + 1)
+
+        # so increment it here instead. Now old_version is reliable.
+        for i, value_tuple in enumerate(values):
+            if isinstance(value_tuple[0], VersionField):
+                assert old_version == value_tuple[2]
+                values[i] = (
+                    value_tuple[0],
+                    value_tuple[1],
+                    value_tuple[2] + 1,
+                )
 
         filter_kwargs = {
             'pk': pk_val,

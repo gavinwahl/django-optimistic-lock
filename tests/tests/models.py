@@ -39,3 +39,14 @@ class CounterModel(VersionedMixin, models.Model):
 
     def __unicode__(self):
         return unicode(self.count)
+
+
+class AbstractModel(VersionedMixin, models.Model):
+    version = VersionField()
+
+    class Meta:
+        abstract = True
+
+
+class ConcreteModel(AbstractModel):
+    name = models.CharField(max_length=100)
