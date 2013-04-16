@@ -10,6 +10,7 @@ setup(
     name='django-optimistic-lock',
     version='0.1',
     description='Offline optimistic locking for Django',
+    url='https://github.com/gavinwahl/django-optimistic-lock',
     long_description=read('README.rst'),
     license='BSD',
     author='Gavin Wahl',
