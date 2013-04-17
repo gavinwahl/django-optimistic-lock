@@ -72,7 +72,7 @@ class OolTests(TestCase):
 
     # can not be fixed until django #20272 is
     @expectedFailure
-    def test_unversioned_parent_fields(self)
+    def test_unversioned_parent_fields(self):
         self.update_fields_still_checks(InheritedVersionedModel)
 
     def test_abstract(self):
@@ -81,13 +81,22 @@ class OolTests(TestCase):
         self.update_fields_doesnt_update(ConcreteModel)
         self.update_fields_still_checks(ConcreteModel)
 
-    @expectedFailure
-    def test_defer(self):
+    def test_defer_version(self):
+        """
+        It doesn't make sense to save after deferring version
+        """
         x = SimpleModel.objects.create(name='foo')
-        y = SimpleModel.objects.defer('version').get(pk=x.pk)
+        x = SimpleModel.objects.defer('version').get(pk=x.pk)
+        with self.assertRaises(RuntimeError):
+            x.save()
+
+    def test_defer_otherwise(self):
+        """
+        We should be able to defer fields other than version
+        """
+        x = SimpleModel.objects.create(name='foo')
+        x = SimpleModel.objects.defer('name').get(pk=x.pk)
         x.save()
-        with self.assertRaises(ConcurrentUpdate):
-            y.save()
 
     def update_fields_doesnt_update(self, model):
         """
