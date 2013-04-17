@@ -69,6 +69,10 @@ class OolTests(TestCase):
         self.normal(InheritedVersionedModel)
         self.conflict(InheritedVersionedModel)
         self.update_fields_doesnt_update(InheritedVersionedModel)
+
+    # can not be fixed until django #20272 is
+    @expectedFailure
+    def test_unversioned_parent_fields(self)
         self.update_fields_still_checks(InheritedVersionedModel)
 
     def test_abstract(self):
