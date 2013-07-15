@@ -1,12 +1,7 @@
-from django import forms
 from django.views.generic import UpdateView
 
 from .models import SimpleModel
-
-
-class SimpleForm(forms.ModelForm):
-    class Meta:
-        model = SimpleModel
+from .forms import SimpleForm
 
 
 form = UpdateView.as_view(

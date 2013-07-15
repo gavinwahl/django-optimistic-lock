@@ -1,7 +1,6 @@
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django import forms
 from django.test.client import Client
 from django import db
 from django.db import transaction
@@ -12,6 +11,7 @@ from ool import ConcurrentUpdate
 from .models import (SimpleModel, ProxyModel, InheritedModel,
                      InheritedVersionedModel, ImproperlyConfiguredModel,
                      CounterModel, ConcreteModel)
+from .forms import SimpleForm
 
 
 def refetch(model_instance):
@@ -133,11 +133,6 @@ class OolTests(TestCase):
 
         with self.assertRaises(ImproperlyConfigured):
             ImproperlyConfiguredModel().get_version_field()
-
-
-class SimpleForm(forms.ModelForm):
-    class Meta:
-        model = SimpleModel
 
 
 class FormTests(TestCase):

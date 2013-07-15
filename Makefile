@@ -1,5 +1,5 @@
 TESTS=tests
-SETTINGS=tests.test_sqlite
+SETTINGS=tests.sqlite_settings
 
 test:
 	cd tests && DJANGO_SETTINGS_MODULE=$(SETTINGS) $(COVERAGE_COMMAND) ./manage.py test $(TESTS) --verbosity=2

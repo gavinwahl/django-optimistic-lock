@@ -16,11 +16,10 @@ setup(
     author='Gavin Wahl',
     author_email='gavinwahl@gmail.com',
     packages=['ool'],
-    install_requires=['django >= 1.6'],
+    install_requires=['django >= 1.6b1'],
     dependency_links=[
-        'https://github.com/django/django/archive/master.zip#egg=django-1.6',
+        'https://github.com/django/django/archive/1.6b1.zip#egg=django-1.6b1',
     ],
-
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

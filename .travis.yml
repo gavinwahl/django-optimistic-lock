@@ -5,13 +5,18 @@ python:
     - "3.2"
     - "3.3"
 env:
-    global:
-        - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
-    matrix:
-        - DB=sqlite
-        - DB=postgres
+  - DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
+  - DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
+  - DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+  - DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+matrix:
+  exclude:
+    - env: DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+      python: "2.6"
+    - env: DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+      python: "2.6"
 install: 'pip install $DJANGO_PACKAGE --use-mirrors && pip install .'
-script: make test SETTINGS=tests.test_travis
+script: make test SETTINGS=tests.travis_settings
 before_script:
   - psql -c 'create database test_ool;' -U postgres
   - pip install psycopg2
