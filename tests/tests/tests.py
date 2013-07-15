@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django import db
 from django.db import transaction
-from django.utils.unittest import skipIf, expectedFailure
+from django.utils.unittest import skipIf
 
 from ool import ConcurrentUpdate
 
@@ -70,8 +70,6 @@ class OolTests(TestCase):
         self.conflict(InheritedVersionedModel)
         self.update_fields_doesnt_update(InheritedVersionedModel)
 
-    # can not be fixed until django #20272 is
-    @expectedFailure
     def test_unversioned_parent_fields(self):
         self.update_fields_still_checks(InheritedVersionedModel)
 
