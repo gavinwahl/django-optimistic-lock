@@ -224,7 +224,7 @@ def test_concurrently(times):
                     exceptions.append(e)
                     raise
                 finally:
-                    db.close_connection()
+                    db.close_old_connections()
             threads = []
             for i in range(times):
                 threads.append(threading.Thread(target=call_test_func))
