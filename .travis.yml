@@ -7,6 +7,8 @@ python:
 env:
   - DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
   - DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
+  - DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
+  - DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
   - DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
   - DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
 matrix:
@@ -14,6 +16,10 @@ matrix:
     - env: DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
       python: "2.6"
     - env: DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+      python: "2.6"
+    - env: DB=sqlite DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
+      python: "2.6"
+    - env: DB=postgres DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
       python: "2.6"
 install: 'pip install $DJANGO_PACKAGE --use-mirrors && pip install .'
 script: make test SETTINGS=tests.travis_settings
