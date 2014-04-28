@@ -57,14 +57,14 @@ class VersionedMixin(object):
     ConcurrentUpdate will be raised.
     """
 
-    def _do_update(self, base_qs, using, pk_val, values, update_fields):
+    def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         version_field = self.get_version_field()
 
         # _do_update is called once for each model in the inheritance
         # hierarchy. We only care about the model with the version field.
         if version_field.model != base_qs.model:
             return super(VersionedMixin, self)._do_update(
-                base_qs, using, pk_val, values, update_fields)
+                base_qs, using, pk_val, values, update_fields, forced_update)
 
         if isinstance(self.__class__.__dict__.get(version_field.attname), DeferredAttribute):
             # With a deferred VersionField, it's not possible to do any

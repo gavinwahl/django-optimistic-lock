@@ -39,7 +39,8 @@ class OolTests(TestCase):
         y.save()
 
         with self.assertRaises(ConcurrentUpdate):
-            x.save()
+            with transaction.atomic():
+                x.save()
         self.assertEqual(refetch(x).name, 'foo')
 
     def test_version_matches_after_insert(self):
