@@ -46,11 +46,19 @@ a ``ConcurrentUpdate``.
 
 Comparison to ``django-concurrency``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`django-concurrency <https://github.com/saxix/django-concurrency>`_
-uses ``SELECT FOR UPDATE`` to implement the version checking. I wanted
-to avoid database-level locking, so ``django-optimistic-lock`` adds a
-version filter to the update statement, as described by Martin Fowler
-[1]_.
+`django-concurrency <https://github.com/saxix/django-concurrency>`_ before
+version 0.7 used ``SELECT FOR UPDATE`` to implement the version checking. I
+wanted to avoid database-level locking, so ``django-optimistic-lock`` adds a
+version filter to the update statement, as described by Martin Fowler [1]_.
+
+Additionally, ool takes a more minimalistic approach than
+django-concurrency by only doing one thing -- optimistic locking --
+without any monkey-patching, middleware, settings variables, admin
+classes, or form fields. django-concurrency would probably make more sense
+if you're looking for something that will attempt to accommodate every
+situation out of the box. Use ool if you just want a straightforward model
+implementation and need to handle the UI and surrounding architecture
+yourself.
 
 Running the tests
 -----------------
