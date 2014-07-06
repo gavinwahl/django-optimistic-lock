@@ -2,7 +2,7 @@ from django.db import models
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.admin.widgets import AdminIntegerFieldWidget
-from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
+from django.db.models.query_utils import DeferredAttribute
 
 
 class ConcurrentUpdate(Exception):
