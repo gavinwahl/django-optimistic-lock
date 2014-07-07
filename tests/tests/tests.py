@@ -22,6 +22,33 @@ def refetch(model_instance):
 
 
 class OolTests(TestCase):
+    def different_creation_ways(self, model):
+        # Create object using the default Manager's create method
+        x = model.objects.create(name='baz')
+        self.assertTrue(refetch(x).name == 'baz')
+        x.delete()
+
+        # Create object as a fresh Model instance rather than using Manager's create method
+        x = model(name='baz')
+        x.save()
+        self.assertTrue(refetch(x).name == 'baz')
+        x.delete()
+
+        # Create object with preset PK value
+        x = model(id=10, name='baz')
+        x.save()
+        y = refetch(x)
+        self.assertTrue(y.name == 'baz')
+        self.assertTrue(y.id == 10)
+        x.delete()
+
+        # Create object using default Manger's create method and preset PK value
+        x = model.objects.create(id=10, name='foo')
+        y = refetch(x)
+        self.assertTrue(y.name == 'foo')
+        self.assertTrue(y.id == 10)
+        x.delete()
+
     def normal(self, model):
         x = model.objects.create(name='foo')
         self.assertTrue(refetch(x).name == 'foo')
@@ -49,24 +76,28 @@ class OolTests(TestCase):
         self.assertEqual(x.version, refetch(x).version)
 
     def test_simple(self):
+        self.different_creation_ways(SimpleModel)
         self.normal(SimpleModel)
         self.conflict(SimpleModel)
         self.update_fields_doesnt_update(SimpleModel)
         self.update_fields_still_checks(SimpleModel)
 
     def test_proxy(self):
+        self.different_creation_ways(ProxyModel)
         self.normal(ProxyModel)
         self.conflict(ProxyModel)
         self.update_fields_doesnt_update(ProxyModel)
         self.update_fields_still_checks(ProxyModel)
 
     def test_inheritance(self):
+        self.different_creation_ways(InheritedModel)
         self.normal(InheritedModel)
         self.conflict(InheritedModel)
         self.update_fields_doesnt_update(InheritedModel)
         self.update_fields_still_checks(InheritedModel)
 
     def test_unversioned_parent(self):
+        self.different_creation_ways(InheritedVersionedModel)
         self.normal(InheritedVersionedModel)
         self.conflict(InheritedVersionedModel)
         self.update_fields_doesnt_update(InheritedVersionedModel)
@@ -75,6 +106,7 @@ class OolTests(TestCase):
         self.update_fields_still_checks(InheritedVersionedModel)
 
     def test_abstract(self):
+        self.different_creation_ways(ConcreteModel)
         self.normal(ConcreteModel)
         self.conflict(ConcreteModel)
         self.update_fields_doesnt_update(ConcreteModel)
