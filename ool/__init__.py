@@ -90,20 +90,19 @@ class VersionedMixin(object):
                     value_tuple[2] + 1,
                 )
 
-        filter_kwargs = {
-            'pk': pk_val,
-            version_field.attname: old_version,
-        }
+        updated = super(VersionedMixin, self)._do_update(
+            base_qs=base_qs.filter(**{version_field.attname: old_version}),
+            using=using,
+            pk_val=pk_val,
+            values=values,
+            update_fields=update_fields if values else None,  # Make sure base_qs is always checked
+            forced_update=forced_update
+        )
 
-
-        if not values:
-            updated = int(base_qs.filter(**filter_kwargs).exists())
-        else:
-            updated = base_qs.filter(**filter_kwargs)._update(values) >= 1
-        if not updated:
+        if not updated and base_qs.filter(pk=pk_val).exists():
             raise ConcurrentUpdate
-        else:
-            return True
+
+        return updated
 
     def get_version_field(self):
         for field in self._meta.fields:
