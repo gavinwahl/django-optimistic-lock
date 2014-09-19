@@ -110,3 +110,9 @@ class VersionedMixin(object):
                 return field
         raise ImproperlyConfigured(
             'VersionedMixin models must have a VersionField')
+
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^ool\.VersionField"])
+except ImportError as e:
+    pass
