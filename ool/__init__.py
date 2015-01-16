@@ -78,7 +78,6 @@ class VersionedMixin(object):
         # version_field is in update_fields. Since we need to reliably know the
         # old version, we can't increment there.
         old_version = version_field.value_from_object(self)
-        setattr(self, version_field.attname, old_version + 1)
 
         # so increment it here instead. Now old_version is reliable.
         for i, value_tuple in enumerate(values):
@@ -89,6 +88,7 @@ class VersionedMixin(object):
                     value_tuple[1],
                     value_tuple[2] + 1,
                 )
+                setattr(self, version_field.attname, old_version + 1)
 
         updated = super(VersionedMixin, self)._do_update(
             base_qs=base_qs.filter(**{version_field.attname: old_version}),

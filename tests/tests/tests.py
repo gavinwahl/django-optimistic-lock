@@ -140,6 +140,9 @@ class OolTests(TestCase):
         y.name = 'bar'
         # bypass versioning by only updating a single field
         y.save(update_fields=['name'])
+        # The version on the instance of y should match the database version.
+        # This allows y to be saved again.
+        self.assertEqual(refetch(y).version, y.version)
 
         x.save()
         self.assertEqual(refetch(x).name, 'foo')
