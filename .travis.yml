@@ -2,8 +2,8 @@ sudo: false
 language: python
 python:
     - "2.7"
-    - "3.2"
-    - "3.3"
+    - "3.4"
+    - "3.5"
 env:
   - DB=sqlite DJANGO_PACKAGE=Django~=1.8
   - DB=postgres DJANGO_PACKAGE=Django~=1.8
