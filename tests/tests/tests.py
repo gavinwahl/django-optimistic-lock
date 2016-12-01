@@ -162,7 +162,7 @@ class OolTests(TestCase):
 
     def test_get_version_field(self):
         self.assertEqual(
-            SimpleModel._meta.get_field_by_name('version')[0],
+            SimpleModel._meta.get_field('version'),
             SimpleModel().get_version_field()
         )
 

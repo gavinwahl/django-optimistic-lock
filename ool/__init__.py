@@ -66,7 +66,7 @@ class VersionedMixin(object):
             return super(VersionedMixin, self)._do_update(
                 base_qs, using, pk_val, values, update_fields, forced_update)
 
-        if isinstance(self.__class__.__dict__.get(version_field.attname), DeferredAttribute):
+        if version_field.attname in self.get_deferred_fields():
             # With a deferred VersionField, it's not possible to do any
             # sensible concurrency checking, so throw an error. The
             # other option would be to treat deferring the VersionField
