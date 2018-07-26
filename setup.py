@@ -16,7 +16,7 @@ setup(
     author='Gavin Wahl',
     author_email='gavinwahl@gmail.com',
     packages=['ool'],
-    install_requires=['django >= 1.8'],
+    install_requires=['django >= 1.11'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

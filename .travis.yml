@@ -6,14 +6,16 @@ python:
     - "3.5"
     - "3.6"
 env:
-  - DB=sqlite DJANGO_PACKAGE=Django~=1.8
-  - DB=postgres DJANGO_PACKAGE=Django~=1.8
-  - DB=sqlite DJANGO_PACKAGE=Django~=1.9
-  - DB=postgres DJANGO_PACKAGE=Django~=1.9
-  - DB=sqlite DJANGO_PACKAGE=Django~=1.10
-  - DB=postgres DJANGO_PACKAGE=Django~=1.10
   - DB=sqlite DJANGO_PACKAGE=Django~=1.11
   - DB=postgres DJANGO_PACKAGE=Django~=1.11
+  - DB=sqlite DJANGO_PACKAGE=Django~=2.0
+  - DB=postgres DJANGO_PACKAGE=Django~=2.0
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DB=sqlite DJANGO_PACKAGE=Django~=2.0
+    - python: "2.7"
+      env: DB=postgres DJANGO_PACKAGE=Django~=2.0
 install: 'pip install $DJANGO_PACKAGE && pip install .'
 script: make test SETTINGS=tests.travis_settings
 before_script:
