@@ -205,8 +205,8 @@ class FormTests(TestCase):
 
     def test_field_is_hidden(self):
         form = SimpleForm(instance=self.obj)
-        self.assertIn(
-            '<input id="id_version" name="version" type="hidden" value="0"',
+        self.assertInHTML(
+            '<input type="hidden" name="version" value="0" id="id_version">',
             form.as_p()
         )
 
@@ -234,9 +234,9 @@ class FormTests(TestCase):
             reverse('admin:tests_simplemodel_change', args=(self.obj.pk,))
         )
 
-        self.assertIn(
-            b'<input id="id_version" name="version" readonly="readonly" type="text" value="0"',
-            resp.content
+        self.assertInHTML(
+            '<input type="text" name="version" value="0" readonly="readonly" required id="id_version">',
+            resp.content.decode()
         )
 
 
