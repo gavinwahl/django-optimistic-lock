@@ -18,4 +18,4 @@ install: 'pip install $DJANGO_PACKAGE && pip install .'
 script: make test SETTINGS=tests.travis_settings
 before_script:
   - psql -c 'create database test_ool;' -U postgres
-  - pip install psycopg2
+  - pip install psycopg2-binary 
