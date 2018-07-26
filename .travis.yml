@@ -4,6 +4,7 @@ python:
     - "2.7"
     - "3.4"
     - "3.5"
+    - "3.6"
 env:
   - DB=sqlite DJANGO_PACKAGE=Django~=1.8
   - DB=postgres DJANGO_PACKAGE=Django~=1.8
@@ -11,6 +12,8 @@ env:
   - DB=postgres DJANGO_PACKAGE=Django~=1.9
   - DB=sqlite DJANGO_PACKAGE=Django~=1.10
   - DB=postgres DJANGO_PACKAGE=Django~=1.10
+  - DB=sqlite DJANGO_PACKAGE=Django~=1.11
+  - DB=postgres DJANGO_PACKAGE=Django~=1.11
 install: 'pip install $DJANGO_PACKAGE && pip install .'
 script: make test SETTINGS=tests.travis_settings
 before_script:
